@@ -7,9 +7,15 @@ class PandaScoreClient(BaseClient):
     def __init__(self):
         pass
     
+    # when scraping matches, what date range, params, live or historical?
+    # If historical, use rest api, if not use websockets
+    # take into account rate limits given
+
     def scrape_matches(self) -> Response:
         pass
-
+    
+    # have to figure out api response format to get the results
+    
     def get_results(self) -> Response:
         pass
 

@@ -3,23 +3,23 @@ from abc import ABC, abstractmethod
 
 class BaseScraper(ABC):
     @abstractmethod
-    def scrape_matches(self) -> JSON:
+    def scrape_matches(self) -> dict:
         pass
 
     @abstractmethod
-    def get_results(self) -> JSON:
+    def get_results(self) -> dict:
         pass
 
     @abstractmethod
-    def get_teams(self) -> JSON:
+    def get_teams(self) -> dict:
         pass
     
     @abstractmethod
-    def get_team_rankings(self) -> JSON:
+    def get_team_rankings(self) -> dict:
         pass
 
     @abstractmethod
-    def get_tournaments(self) -> JSON:
+    def get_tournaments(self) -> dict:
         pass
     
 class BaseClient(ABC):
