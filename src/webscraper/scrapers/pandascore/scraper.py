@@ -1,12 +1,18 @@
 """PandaScore scraper implementation for extracting match, team, and player data from PandaScore API."""
-from base import BaseScraper
+from scrapers.base import BaseScraper
+from scrapers.pandascore.config import headers
+import requests
+
 class PandaScoreScraper(BaseScraper):
-    panda_score_client: PandaScoreClient = PandaScoreClient()
+    
     def __init__(self):
-        pass
+        self.base_url = "https://api.pandascore.co/csgo/"
+        self.filter = "?filter[videogame_title]=cs-2&page=1&per_page=1"
     
     def scrape_matches(self):
-        pass
+        url = self.base_url + 'matches' + self.filter
+        response = requests.get(url, headers=headers)
+        return response
 
     def get_results(self):
         pass
@@ -19,4 +25,6 @@ class PandaScoreScraper(BaseScraper):
 
     def get_tournaments(self):
         pass
-    
+
+# scraper = PandaScoreScraper()
+# print(scraper.scrape_matches().text)
