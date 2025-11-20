@@ -2,6 +2,7 @@
 from scrapers.base import BaseScraper
 from scrapers.pandascore.config import headers
 from datetime import datetime, timedelta, timezone
+from scrapers.pandascore.utils import convert_datetime_to_string
 import requests
 class PandaScoreScraper(BaseScraper):
     
@@ -12,7 +13,7 @@ class PandaScoreScraper(BaseScraper):
     def scrape_matches(self):
         current_date = datetime.now(timezone.utc)
         past_date = current_date - timedelta(hours=24)
-        url = self.base_url + 'matches' + self.base_filter + "&filter[begin_at][0]=" + past_date.isoformat() + "&filter[end_at][0]=" + current_date.isoformat() + self.base_pagination
+        url = self.base_url + 'matches' + self.base_filter + "&range[begin_at]=" + convert_datetime_to_string(past_date) + "," + convert_datetime_to_string(current_date) + self.base_pagination
         print(url)
         response = requests.get(url, headers=headers)
         return response
@@ -29,7 +30,8 @@ class PandaScoreScraper(BaseScraper):
     def get_tournaments(self):
         pass
 
-# print((datetime.now(timezone.utc) - timedelta(hours=24)).isoformat())
+# print(datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'))
+# print((datetime.now(timezone.utc) - timedelta(hours=24)).isoformat().replace('+00:00', 'Z'))
 # dt_str = datetime.now(timezone.utc) - timedelta(hours=24)
 # print(datetime.now(timezone.utc).isoformat())
 scraper = PandaScoreScraper()
