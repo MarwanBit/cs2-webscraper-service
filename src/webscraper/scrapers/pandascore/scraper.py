@@ -10,15 +10,12 @@ class PandaScoreScraper(BaseScraper):
         self.base_url = "https://api.pandascore.co/csgo/"
         self.base_filter = "?filter[videogame_title]=cs-2"
         self.base_pagination = "&page=1&per_page=1"
+
     def scrape_matches(self):
-        current_date = datetime.now(timezone.utc)
-        past_date = current_date - timedelta(hours=24)
-        url = self.base_url + 'matches' + self.base_filter + "&range[begin_at]=" + convert_datetime_to_string(past_date) + "," + convert_datetime_to_string(current_date) + self.base_pagination
-        print(url)
-        response = requests.get(url, headers=headers)
-        return response
+        pass
 
     def get_results(self):
+        # need to run sql query for this one
         pass
 
     def get_teams(self):
@@ -29,10 +26,3 @@ class PandaScoreScraper(BaseScraper):
 
     def get_tournaments(self):
         pass
-
-# print(datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'))
-# print((datetime.now(timezone.utc) - timedelta(hours=24)).isoformat().replace('+00:00', 'Z'))
-# dt_str = datetime.now(timezone.utc) - timedelta(hours=24)
-# print(datetime.now(timezone.utc).isoformat())
-scraper = PandaScoreScraper()
-print(scraper.scrape_matches().text)

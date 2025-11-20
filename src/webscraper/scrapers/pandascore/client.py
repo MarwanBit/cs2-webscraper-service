@@ -1,18 +1,27 @@
 """HTTP client for making authenticated requests to the PandaScore API with rate limiting."""
-from base import BaseClient
+from scrapers.base import BaseClient
+from scrapers.pandascore.config import headers
+from datetime import datetime, timedelta, timezone
+from scrapers.pandascore.utils import convert_datetime_to_string
+import requests
+
 class PandaScoreClient(BaseClient):
-    BASE_URL: str = super.__init_()
-    pandascore_auth_token: str = ""
-    
     def __init__(self):
-        pass
+        self.base_url = "https://api.pandascore.co/csgo/"
+        self.base_filter = "?filter[videogame_title]=cs-2"
+        self.base_pagination = "&page=1&per_page=1"
     
     # when scraping matches, what date range, params, live or historical?
     # If historical, use rest api, if not use websockets
     # take into account rate limits given
 
     def scrape_matches(self) -> Response:
-        pass
+        current_date = datetime.now(timezone.utc)
+        past_date = current_date - timedelta(hours=24)
+        url = self.base_url + 'matches' + self.base_filter + "&range[begin_at]=" + convert_datetime_to_string(past_date) + "," + convert_datetime_to_string(current_date) + self.base_pagination
+        response = requests.get(url, headers=headers)
+        # add matches to the the db
+        return response
     
     # have to figure out api response format to get the results
     
@@ -27,5 +36,11 @@ class PandaScoreClient(BaseClient):
 
     def get_tournaments(self) -> Response:
         pass
-    
+
+# print(datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'))
+# print((datetime.now(timezone.utc) - timedelta(hours=24)).isoformat().replace('+00:00', 'Z'))
+# dt_str = datetime.now(timezone.utc) - timedelta(hours=24)
+# print(datetime.now(timezone.utc).isoformat())
+client = PandaScoreClient()
+print(client.scrape_matches().text)
 
