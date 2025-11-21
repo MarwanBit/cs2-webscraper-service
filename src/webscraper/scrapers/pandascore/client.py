@@ -21,12 +21,20 @@ class PandaScoreClient(BaseClient):
         url = self.base_url + 'matches' + self.base_filter + "&range[begin_at]=" + convert_datetime_to_string(past_date) + "," + convert_datetime_to_string(current_date) + self.base_pagination
         response = requests.get(url, headers=headers)
         # add matches to the the db
+        # add teams to the db
+        # add tournaments to the db
         return response
     
     # have to figure out api response format to get the results
     
     def get_results(self) -> Response:
-        pass
+        # fetch leftover matches from db
+        matches = ["123", "456", "789"]
+        for match_id in matches:
+            url = self.base_url + "matches/" + match_id
+            response = requests.get(url, headers=headers)
+            # insert to results table in db
+
 
     def get_teams(self) -> Response:
         pass
