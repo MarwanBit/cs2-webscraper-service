@@ -1,0 +1,46 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:latest
+    restart: always
+    env_file:
+      .env
+    volumes:
+      - pgdata:/var/lib/postgresql         # persistent db data
+    ports:
+      - 5432:5432
+    networks:
+      - initexample
+    
+  metabase:
+    image: metabase/metabase:latest
+    depends_on:
+      - postgres
+    ports:
+      - 3000:3000
+    networks:
+      - initexample
+
+  pythonapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: webscraper-app
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    networks:
+      - initexample
+    volumes:
+      - .:/app                          # Mount entire project
+      - poetry-cache:/app/.venv         # Keep venv separate
+      - /app/__pycache__                # Exclude pycache
+
+networks:
+  initexample:
+    driver: bridge
+
+volumes:
+  pgdata:
+  poetry-cache:
