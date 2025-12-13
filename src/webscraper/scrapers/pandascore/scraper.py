@@ -4,6 +4,8 @@ from scrapers.pandascore.config import headers
 from datetime import datetime, timedelta, timezone
 from scrapers.pandascore.utils import convert_datetime_to_string
 import requests
+from sqlalchemy import create_engine, text
+
 class PandaScoreScraper(BaseScraper):
     
     def __init__(self):
