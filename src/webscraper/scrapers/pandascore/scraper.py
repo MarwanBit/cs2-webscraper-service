@@ -4,7 +4,7 @@ from scrapers.pandascore.config import headers
 from datetime import datetime, timedelta, timezone
 from scrapers.pandascore.utils import convert_datetime_to_string
 import requests
-from sqlalchemy import create_engine, text
+from webscraper.modules.teams_service import get_all_teams
 
 class PandaScoreScraper(BaseScraper):
     
