@@ -25,24 +25,24 @@ class BaseScraper(ABC):
 class BaseClient(ABC):
     BASE_URL: str = ""
     
-    def request(self, method: str, endpoint: str, **kwargs) -> Response:
+    def request(self, method: str, endpoint: str, **kwargs):
         pass
 
-    def get(self, endpoint: str, **kwargs) -> Response:
+    def get(self, endpoint: str, **kwargs):
         pass
     
-    def scrape_matches(self) -> Response:
+    def scrape_matches(self):
         pass
-    def get_results(self) -> Response:
+    def get_results(self):
         pass
 
-    def get_teams(self) -> Response:
+    def get_teams(self):
         pass
     
-    def get_team_rankings(self) -> Response:
+    def get_team_rankings(self):
         pass
 
-    def get_tournaments(self) -> Response:
+    def get_tournaments(self):
         pass
 
 
