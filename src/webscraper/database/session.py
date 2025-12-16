@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-load_dotenv(override=True)
+load_dotenv(override=True) # change this when moving to production
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 # Create engine

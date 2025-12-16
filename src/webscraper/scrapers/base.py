@@ -6,21 +6,21 @@ class BaseScraper(ABC):
     def scrape_matches(self) -> dict:
         pass
 
-    @abstractmethod
-    def get_results(self) -> dict:
-        pass
+    # @abstractmethod
+    # def get_results(self) -> dict:
+    #     pass
 
-    @abstractmethod
-    def get_teams(self) -> dict:
-        pass
+    # @abstractmethod
+    # def get_teams(self) -> dict:
+    #     pass
     
-    @abstractmethod
-    def get_team_rankings(self) -> dict:
-        pass
+    # @abstractmethod
+    # def get_team_rankings(self) -> dict:
+    #     pass
 
-    @abstractmethod
-    def get_tournaments(self) -> dict:
-        pass
+    # @abstractmethod
+    # def get_tournaments(self) -> dict:
+    #     pass
     
 class BaseClient(ABC):
     BASE_URL: str = ""
@@ -33,7 +33,6 @@ class BaseClient(ABC):
     
     def scrape_matches(self) -> Response:
         pass
-
     def get_results(self) -> Response:
         pass
 
@@ -45,5 +44,6 @@ class BaseClient(ABC):
 
     def get_tournaments(self) -> Response:
         pass
+
 
 

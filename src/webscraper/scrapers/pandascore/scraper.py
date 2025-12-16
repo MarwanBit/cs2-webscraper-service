@@ -7,7 +7,12 @@ import requests
 from webscraper.modules.teams_service import get_all_teams
 
 class PandaScoreScraper(BaseScraper):
-    
+    # get teams, fetch last 24 hours for given teams
+    # put the matches along with relevant data into matches table using the pandascore api
+    # also get what tournaments they are in
+
+    # just call one function that does all this at once
+
     def __init__(self):
         self.base_url = "https://api.pandascore.co/csgo/"
         self.base_filter = "?filter[videogame_title]=cs-2"
@@ -16,15 +21,15 @@ class PandaScoreScraper(BaseScraper):
     def scrape_matches(self):
         pass
 
-    def get_results(self):
-        # need to run sql query for this one
-        pass
+    # def get_results(self):
+    #     # need to run sql query for this one
+    #     pass
 
-    def get_teams(self):
-        pass
+    # def get_teams(self):
+    #     pass
     
-    def get_team_rankings(self):
-        pass
+    # def get_team_rankings(self):
+    #     pass
 
-    def get_tournaments(self):
-        pass
+    # def get_tournaments(self):
+    #     pass
