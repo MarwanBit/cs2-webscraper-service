@@ -18,15 +18,17 @@ class PandaScoreClient(BaseClient):
 
     def scrape_matches(self):
         teams = get_all_teams()
-        print(teams)
-        # current_date = datetime.now(timezone.utc)
-        # past_date = current_date - timedelta(hours=24)
-        # url = self.base_url + 'matches' + self.base_filter + "&range[begin_at]=" + convert_datetime_to_string(past_date) + "," + convert_datetime_to_string(current_date) + self.base_pagination
-        # response = requests.get(url, headers=headers)
-        # # add matches to the the db
-        # # add teams to the db
-        # # add tournaments to the db
-        # return response
+        current_date = datetime.now(timezone.utc)
+        past_date = current_date - timedelta(hours=24)
+        for t in teams:
+            url = self.base_url + 'matches' + self.base_filter + "&filter[opponent_id]=" + t.team_name.lower() + "&range[begin_at]=" + convert_datetime_to_string(past_date) + "," + convert_datetime_to_string(current_date) + self.base_pagination
+            print(url)
+            response = requests.get(url, headers=headers)
+            print(response.text)
+        # add matches to the the db
+        # add teams to the db
+        # add tournaments to the db
+        return ""
     
     # have to figure out api response format to get the results
     
