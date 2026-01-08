@@ -1,23 +1,16 @@
 version: '3.8'
 services:
   postgres:
-    image: postgres:latest
+    image: postgres:17
     restart: always
-    env_file:
-      .env
+    environment:
+      POSTGRES_DB: cs2_db
+      POSTGRES_USER: initexample
+      POSTGRES_PASSWORD: initexample
     volumes:
-      - pgdata:/var/lib/postgresql         # persistent db data
+      - pgdata:/var/lib/postgresql/data  # persistent db data
     ports:
-      - 5432:5432
-    networks:
-      - initexample
-    
-  metabase:
-    image: metabase/metabase:latest
-    depends_on:
-      - postgres
-    ports:
-      - 3000:3000
+      - 5431:5432
     networks:
       - initexample
 
@@ -28,8 +21,6 @@ services:
     container_name: webscraper-app
     depends_on:
       - postgres
-    env_file:
-      - .env
     networks:
       - initexample
     volumes:
