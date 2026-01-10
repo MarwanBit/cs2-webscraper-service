@@ -7,15 +7,16 @@ class PandascoreClient:
 
     def __init__(self):
         self.base_url = "https://api.pandascore.co/"
-        self.pandascore_auth_token = "AxVPy94ttMbp42PZsOnFjduTEUIkdi67_oc0VRJ1jLyEgO5KQGM"
+        # THIS NEEDS TO IMMEDIATELY BE REMOVED
+        self.pandascore_auth_token = "YOUR_PANDASCORE_API_KEY_HERE"
         self.headers = {"Authorization": "Bearer " + self.pandascore_auth_token}
 
     def get_matches(self):
-        r = requests.get(self.base_url + "csgo/matches", headers=self.headers)
+        r = requests.get(self.base_url + 'csgo/matches', headers=self.headers)
         return r.json()
 
     def get_results(self):
-        r = requests.get(self.base_url + " csgo/matches/past", headers=self.headers)
+        r = requests.get(self.base_url + 'csgo/matches/past', headers=self.headers)
         return r.json()
 
     def get_teams(self):
