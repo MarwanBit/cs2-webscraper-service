@@ -1,22 +1,22 @@
-[tool.poetry]
-name = "webscraper"
+[project]
+name = "cs2-webscraper-service"
 version = "0.1.0"
 description = ""
-authors = ["MarwanBit <38559602+MarwanBit@users.noreply.github.com>"]
+authors = [
+    {name = "MarwanBit",email = "38559602+MarwanBit@users.noreply.github.com"}
+]
 readme = "README.md"
-packages = [{include = "webscraper", from = "src"}]
+requires-python = ">=3.12"
+dependencies = [
+    "click (>=8.3.1,<9.0.0)",
+    "beautifulsoup4 (>=4.14.3,<5.0.0)",
+    "django (>=6.0.1,<7.0.0)",
+    "bs4 (>=0.0.2,<0.0.3)",
+    "requests (>=2.32.5,<3.0.0)"
+]
 
-[tool.poetry.dependencies]
-python = ">=3.12"
-django = ">=5.2.8,<6.0.0"
-numpy = "^2.3.5"
-
-[tool.poetry.group.dev.dependencies]
-pytest = ">=9.0.0,<10.0.0"
-ruff = ">=0.14.5,<0.15.0"
-
-[tool.poetry.scripts]
-main = "webscraper.main:main"
+[tool.poetry]
+packages = [{include = "cs2_webscraper_service", from = "src"}]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
