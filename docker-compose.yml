@@ -28,8 +28,7 @@ services:
       - poetry-cache:/app/.venv         # Keep venv separate
       - /app/__pycache__                # Exclude pycache
     ports:
-      - 8000:8000
-    command: poetry run python manage.py runserver 0.0.0.0:8000
+      - 8000:8000 #host_port:container_port
 
 networks:
   initexample:
