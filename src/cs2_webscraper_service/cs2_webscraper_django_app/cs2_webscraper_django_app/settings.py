@@ -27,7 +27,9 @@ SECRET_KEY = "django-insecure-9a4*^t9zwruf7!xt2t%fz0c^&j(-k&5xt6+abkxc6*#h7qqg&6
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '0.0.0.0'
+]
 
 
 # Application definition
@@ -41,6 +43,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Your apps
     "core",
+    "cli",
+    "scrapers",
+    "utils"
 ]
 
 MIDDLEWARE = [
@@ -82,8 +87,8 @@ DATABASES = {
         'NAME': os.environ.get('POSTGRES_DB', 'cs2_db'),
         'USER': os.environ.get('POSTGRES_USER', 'initexample'),
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'initexample'),
-        'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),  # Docker service name
-        'PORT': os.environ.get('POSTGRES_PORT', '5431'),
+        'HOST': os.environ.get('POSTGRES_HOST', 'postgres'),  # Docker service name
+        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
     }
 }
 
