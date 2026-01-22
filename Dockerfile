@@ -24,5 +24,5 @@ RUN poetry install
 # Set working directory to where manage.py lives
 WORKDIR /app/src/cs2_webscraper_service/cs2_webscraper_django_app
 
-# Run Django server (poetry run uses the venv automatically)
-CMD ["poetry", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Create migrations, apply them, then start Django server
+CMD poetry run python manage.py makemigrations && poetry run python manage.py migrate && poetry run python manage.py runserver 0.0.0.0:8000
