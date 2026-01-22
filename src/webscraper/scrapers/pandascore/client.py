@@ -4,7 +4,7 @@ from cs2_webscraper_service.cs2_webscraper_django_app.scrapers.pandascore.config
 from datetime import datetime, timedelta, timezone
 from cs2_webscraper_service.cs2_webscraper_django_app.scrapers.pandascore.utils import convert_datetime_to_string
 import requests
-from cs2_webscraper_service.cs2_webscraper_django_app.modules.teams_service import get_all_teams
+from cs2_webscraper_django_app.modules.teams_service import get_all_teams
 
 class PandaScoreClient(BaseClient):
     def __init__(self):
