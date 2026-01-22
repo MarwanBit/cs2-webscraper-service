@@ -4,7 +4,7 @@ from scrapers.pandascore.config import headers
 from datetime import datetime, timedelta, timezone
 from scrapers.pandascore.utils import convert_datetime_to_string
 import requests
-from webscraper.modules.teams_service import get_all_teams
+from cs2_webscraper_service.cs2_webscraper_django_app.modules.teams_service import get_all_teams
 
 class PandaScoreScraper(BaseScraper):
     # get teams, fetch last 24 hours for given teams
