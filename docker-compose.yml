@@ -27,6 +27,8 @@ services:
       - .:/app                          # Mount entire project
       - poetry-cache:/app/.venv         # Keep venv separate
       - /app/__pycache__                # Exclude pycache
+    ports:
+      - 8000:8000 #host_port:container_port
 
 networks:
   initexample:
