@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     "core",
     "cli",
     "scrapers",
-    "utils"
+    # Note: utils is NOT a Django app (no apps.py), just import it as a module
 ]
 
 MIDDLEWARE = [
