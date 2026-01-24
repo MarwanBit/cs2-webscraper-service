@@ -1,78 +1,72 @@
-import requests
-import json
-import time
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
-from scrapers.base import BaseClient
+from http.client import HTTPResponse
+from bs4 import BeautifulSoup
+from urllib.request import Request, urlopen
+import requests
 from playwright.sync_api import sync_playwright
 
-# #region agent log helper
-def _dbg(hyp, msg, data): open('/app/.cursor/debug.log','a').write(json.dumps({"hypothesisId":hyp,"message":msg,"data":data,"timestamp":int(time.time()*1000),"sessionId":"debug-session"})+'\n')
-# #endregion
+class HLTVClient:
 
-"""HTTP client for making requests to HLTV.org with rate limiting and error handling."""
-class HLTVClient(BaseClient):
     def __init__(self):
-        self.base_url = "https://www.hltv.org/stats/"
+        self.base_url = 'https://www.hltv.org'
+        self.browser_args = [
+            "--disable-blink-features=AutomationControlled",
+            "--no-sandbox",
+            "--disable-dev-shm-usage",
+        ]
+        self.user_agent = (
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/120.0.0.0 Safari/537.36"
+        )
+        self.viewport = {"width": 1280, "height": 800}
+        self.locale = "en-US"
 
-    def get_top_50_teams(self):
-        current_date = datetime.now()
-        last_three_months = current_date - relativedelta(months=3)
+
+    def get_match(self, match_id: str, match_name: str) -> HTTPResponse:
+        url = self.base_url + '/matches' + '/' + match_id + '/' + match_name
         with sync_playwright() as p:
-            # #region agent log - try Firefox with stealth JS injection (Hypothesis G, F, H)
-            _dbg("G", "using_firefox", {"browser": "firefox"})
-            browser = p.firefox.launch(headless=True)
+            browser = p.chromium.launch(headless=True, args=self.browser_args)
             context = browser.new_context(
-                user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0',
-                viewport={'width': 1920, 'height': 1080},
+                user_agent = self.user_agent,
+                viewport = self.viewport,
+                locale = self.locale
             )
             page = context.new_page()
-            
-            # Inject script to mask webdriver detection (Hypothesis F)
-            page.add_init_script("""
-                Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
-                Object.defineProperty(navigator, 'plugins', {get: () => [1, 2, 3, 4, 5]});
-                Object.defineProperty(navigator, 'languages', {get: () => ['en-US', 'en']});
-                window.chrome = { runtime: {} };
-            """)
-            _dbg("F", "stealth_js_injected", {"properties": ["webdriver", "plugins", "languages", "chrome"]})
-            # #endregion
-            
-            url = self.base_url + "teams?startDate=" + last_three_months.strftime("%Y-%m-%d") + "&endDate=" + current_date.strftime("%Y-%m-%d") + "&rankingFilter=Top50"
-
-            page.goto(url, timeout=60000, wait_until='domcontentloaded')
-
-            # #region agent log - wait for Cloudflare to resolve
-            _dbg("FIX", "initial_title", {"title": page.title()})
-            
-            # Wait for Cloudflare challenge to resolve (title changes from "Just a moment...")
-            for i in range(30):  # Try for 30 seconds
-                if "just a moment" not in page.title().lower():
-                    _dbg("FIX", "cloudflare_passed", {"attempt": i, "title": page.title()})
-                    break
-                _dbg("FIX", "waiting_cloudflare", {"attempt": i, "title": page.title()})
-                page.wait_for_timeout(1000)
-            # #endregion
-
-            # #region agent log - after navigation
-            _dbg("D", "page_url_after_nav", {"url": page.url})
-            _dbg("A,E", "page_title", {"title": page.title()})
-            _dbg("A,E", "page_html_snippet", {"html": page.content()[:2000]})
-            _dbg("B", "all_tables_on_page", {"tables": [t.get_attribute("class") for t in page.query_selector_all("table")]})
-            _dbg("E", "cloudflare_check", {"has_cf": "cloudflare" in page.content().lower() or "challenge" in page.content().lower()})
-            # #endregion
-
-            print(page)
-
-            page.wait_for_selector("table.stats-table.player-ratings-table", timeout=60000)
-
-            teams = page.query_selector_all("table.stats-table.player-ratings-table tbody tr")
-
-            for row in teams:
-                name = row.query_selector("td.teamCol-teams-overview").inner_text()
-                print(name)
-
+            page.goto(url, wait_until="domcontentloaded")
+            page.wait_for_selector(".match-page", timeout=60000)
+            html = page.content()
+            with open("debug_hltv_matches.html", "w", encoding="utf-8") as f:
+                f.write(html)
             browser.close()
 
-client = HLTVClient()
-print(client.get_top_50_teams())
+    def get_result(self, match_id: str, match_name: str) -> HTTPResponse:
+        # same as get_match with some error handling
+        pass
+
+    def get_team(self, team_id: str, team_name: str) -> HTTPResponse:
+        url = self.base_url + '/team' + '/' + team_id + '/' + team_name
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True, args=self.browser_args)
+            context = browser.new_context(
+                user_agent = self.user_agent,
+                viewport = self.viewport,
+                locale = self.locale
+            )
+            page = context.new_page()
+            page.goto(url, wait_until="domcontentloaded")
+            page.wait_for_selector(".teamProfile", timeout=60000)
+            html = page.content()
+            with open("debug_hltv_team.html", "w", encoding="utf-8") as f:
+                f.write(html)
+            browser.close()
+
+    def get_team_ranking(self, team_id: str, date: datetime) -> HTTPResponse:
+        pass
+
+    def get_tournament(self, tournament_id: str) -> HTTPResponse:
+        pass
+
+if __name__ == "__main__":
+    hltv_client = HLTVClient()
+    hltv_client.get_team('9565', 'vitality')
