@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # Your apps
-    "core",
+    "cs2_webscraper_service.cs2_webscraper_django_app.core.apps.CoreConfig",
     "cli",
     "scrapers",
     "utils"

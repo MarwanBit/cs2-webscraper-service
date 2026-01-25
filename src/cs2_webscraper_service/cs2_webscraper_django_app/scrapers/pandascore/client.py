@@ -1,11 +1,21 @@
 """HTTP client for making authenticated requests to the PandaScore API with rate limiting."""
+import os
+import django
+import sys
+# insert absolute path, only for debugging
+PROJECT_ROOT = "/app/src/cs2_webscraper_service/cs2_webscraper_django_app"
+sys.path.insert(0, PROJECT_ROOT)
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cs2_webscraper_django_app.cs2_webscraper_django_app.settings")
+# print(sys.path) for debugging path issues
+# print(sys.executable) ^
+django.setup()
 from cs2_webscraper_service.cs2_webscraper_django_app.scrapers.base import BaseClient
 from cs2_webscraper_service.cs2_webscraper_django_app.scrapers.pandascore.config import headers
 from datetime import datetime, timedelta, timezone
 from cs2_webscraper_service.cs2_webscraper_django_app.scrapers.pandascore.utils import convert_datetime_to_string
 import requests
-from cs2_webscraper_service.cs2_webscraper_django_app.modules.teams_service import get_all_teams
-
+# from cs2_webscraper_service.cs2_webscraper_django_app.modules.teams_service import get_all_teams
+from cs2_webscraper_service.cs2_webscraper_django_app.core.models import Team
 class PandaScoreClient(BaseClient):
     def __init__(self):
         self.base_url = "https://api.pandascore.co/csgo/"
@@ -17,11 +27,11 @@ class PandaScoreClient(BaseClient):
     # take into account rate limits given
 
     def scrape_matches(self):
-        teams = get_all_teams()
+        teams = Team.objects.all()
         current_date = datetime.now(timezone.utc)
         past_date = current_date - timedelta(hours=24)
         for t in teams:
-            url = self.base_url + 'matches' + self.base_filter + "&filter[opponent_id]=" + t.team_name.lower() + "&range[begin_at]=" + convert_datetime_to_string(past_date) + "," + convert_datetime_to_string(current_date) + self.base_pagination
+            url = self.base_url + 'matches' + self.base_filter + "&filter[opponent_id]=" + t.name.lower() + "&range[begin_at]=" + convert_datetime_to_string(past_date) + "," + convert_datetime_to_string(current_date) + self.base_pagination
             print(url)
             response = requests.get(url, headers=headers)
             print(response.text)
