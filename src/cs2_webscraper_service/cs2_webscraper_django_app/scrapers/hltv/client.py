@@ -53,7 +53,8 @@ class HLTVClient:
        
     def get_result(self, match_id: str, match_name: str) -> HTTPResponse:
         # same as get_match with some error handling
-        pass
+        # we should do some verification on the match to ensure that it has a valid result
+        return self.get_match(match_id, match_name)
 
     def get_team(self, team_id: str, team_name: str) -> HTTPResponse:
         url = f"{self.base_url}/team/{team_id}/{team_name}"
