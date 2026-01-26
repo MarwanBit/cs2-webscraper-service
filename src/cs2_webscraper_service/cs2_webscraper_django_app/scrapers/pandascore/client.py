@@ -30,7 +30,12 @@ class PandaScoreClient(BaseClient):
         teams = Team.objects.all()
         current_date = datetime.now(timezone.utc)
         past_date = current_date - timedelta(hours=24)
+        # for testing
+        # current_date = "2026-01-12T22:44:15.508742Z"
+        # past_date = "2026-01-11T22:44:15.508742Z"
         for t in teams:
+            # for testing
+            # url = self.base_url + 'matches' + self.base_filter + "&filter[opponent_id]=" + t.name.lower() + "&range[begin_at]=" + past_date + "," + current_date + self.base_pagination
             url = self.base_url + 'matches' + self.base_filter + "&filter[opponent_id]=" + t.name.lower() + "&range[begin_at]=" + convert_datetime_to_string(past_date) + "," + convert_datetime_to_string(current_date) + self.base_pagination
             print(url)
             response = requests.get(url, headers=headers)
