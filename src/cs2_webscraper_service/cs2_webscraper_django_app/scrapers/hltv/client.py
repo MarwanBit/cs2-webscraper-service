@@ -39,7 +39,8 @@ class HLTVClient:
         self.page = self.context.new_page()
 
     def _fetch_page(self, url: str, selector: str, debug_file: str) -> str:
-        self.page.goto(url, wait_until="domcontentloaded")
+        self.page.goto(url, wait_until="domcontentloaded") #domcontentloaded
+        print(self.page.content())
         self.page.wait_for_selector(selector, timeout = self.timeout)
         html = self.page.content()
         if debug_file:
@@ -77,6 +78,6 @@ if __name__ == "__main__":
     hltv_client = HLTVClient()
     # hltv_client.get_match('2389280', 'paravision-vs-furia-blast-bounty-2026-season-1-finals')
     # hltv_client.get_team('9565', 'vitality')
-    # hltv_client.get_tournament('8575', 'iem-krakw-2026-stage-1')
+    hltv_client.get_tournament('8575', 'iem-krakw-2026-stage-1')
     # this is vitality team_ranking (valve ranking)
-    hltv_client.get_team_ranking("2026", "january", '24', '95665', 'valve-ranking')
+    # hltv_client.get_team_ranking("2026", "january", '24', '95665', 'valve-ranking')

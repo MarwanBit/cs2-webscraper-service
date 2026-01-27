@@ -34,12 +34,13 @@ class HLTVCrawler:
 
         #(1) INPUT VALIDATION: check that start_date and end_date are in range
         url = f'{self.hltv_client.base_url}/results?startDate={str(start_date)}&endDate={str(end_date)}'
-        resp = self.hltv_client._fetch_page(url, '.results', 'debug_hltv_result.html')
+        resp = self.hltv_client._fetch_page(url, '.sidebar-headline', 'debug_hltv_result.html')
 
         # Now that we have our response we want to go through each .result tag and get their link content
         # notice reach .result has a parent a tage which has the href which is the link to the match
         # what we can do is then get this link, extract the match_id and match_name using regex matching
-        pass
+        bs = BeautifulSoup(resp, 'html.parser')
+        print(bs.find('.result').parent.href)
 
     def crawl_teams(self, start_date: date, end_date: date) -> list[str]:
         pass
@@ -49,3 +50,8 @@ class HLTVCrawler:
 
     def crawl_tournaments(self, start_date: date, end_date: date) -> list[str]:
         pass
+
+
+if __name__ == "__main__":
+    crawler = HLTVCrawler()
+    crawler.crawl_results(date(2026, 1, 20), date(2026, 1, 26))
