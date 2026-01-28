@@ -14,8 +14,9 @@ from cs2_webscraper_service.cs2_webscraper_django_app.scrapers.pandascore.config
 from datetime import datetime, timedelta, timezone
 from cs2_webscraper_service.cs2_webscraper_django_app.scrapers.pandascore.utils import convert_datetime_to_string
 import requests
-# from cs2_webscraper_service.cs2_webscraper_django_app.modules.teams_service import get_all_teams
+from cs2_webscraper_service.cs2_webscraper_django_app.modules.teams_service import get_match_details
 from cs2_webscraper_service.cs2_webscraper_django_app.core.models import Team
+from cs2_webscraper_service.cs2_webscraper_django_app.core.models import Match
 class PandaScoreClient(BaseClient):
     def __init__(self):
         self.base_url = "https://api.pandascore.co/csgo/"
@@ -31,15 +32,31 @@ class PandaScoreClient(BaseClient):
         current_date = datetime.now(timezone.utc)
         past_date = current_date - timedelta(hours=24)
         # for testing
-        # current_date = "2026-01-12T22:44:15.508742Z"
-        # past_date = "2026-01-11T22:44:15.508742Z"
+        current_date = "2026-01-12T22:44:15.508742Z"
+        past_date = "2026-01-11T22:44:15.508742Z"
         for t in teams:
             # for testing
-            # url = self.base_url + 'matches' + self.base_filter + "&filter[opponent_id]=" + t.name.lower() + "&range[begin_at]=" + past_date + "," + current_date + self.base_pagination
-            url = self.base_url + 'matches' + self.base_filter + "&filter[opponent_id]=" + t.name.lower() + "&range[begin_at]=" + convert_datetime_to_string(past_date) + "," + convert_datetime_to_string(current_date) + self.base_pagination
+            url = self.base_url + 'matches' + self.base_filter + "&filter[opponent_id]=" + t.name.lower() + "&range[begin_at]=" + past_date + "," + current_date + self.base_pagination
+            # url = self.base_url + 'matches' + self.base_filter + "&filter[opponent_id]=" + t.name.lower() + "&range[begin_at]=" + convert_datetime_to_string(past_date) + "," + convert_datetime_to_string(current_date) + self.base_pagination
             print(url)
             response = requests.get(url, headers=headers)
             print(response.text)
+
+            # insert match to db
+            match_details = get_match_details(response)
+            match, created = Match.objects.update_or_create(
+                defaults = {
+                    "source": "Pandascore",
+                    "source_match_id": match_details.match_id,
+                    "match_date": match_details.match_date,
+                    "best_of": match_details.best_of,
+                    "created_at": datetime.now(timezone.utc),
+                    "updated_at": datetime.now(timezone.utc),
+                    "team1_id_id": match_details.team1_id,
+                    "team2_id_id": match_details.team2_id,
+                    "tournament_id": match_details.tournament_id
+                } 
+            )
         # add matches to the the db
         # add teams to the db
         # add tournaments to the db
@@ -57,6 +74,8 @@ class PandaScoreClient(BaseClient):
 
 
     def get_teams(self):
+        # fetch top 50 from hltv with name, slug, and id,
+        # insert them into the id
         pass
     
     def get_team_rankings(self):

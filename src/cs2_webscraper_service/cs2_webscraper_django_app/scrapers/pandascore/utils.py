@@ -5,3 +5,6 @@ from datetime import datetime, timedelta, timezone
 """
 def convert_datetime_to_string(date: datetime):
     return date.isoformat().replace('+00:00', 'Z')
+
+def get_match_details(match: dict):
+    pass
