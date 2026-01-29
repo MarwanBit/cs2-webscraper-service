@@ -1,18 +1,20 @@
+import json, time
 from datetime import date, datetime, timedelta
 from datetime import datetime
 from http.client import HTTPResponse
 from bs4 import BeautifulSoup
 from urllib.request import Request, urlopen
 import requests
-from playwright.sync_api import sync_playwright
-from .client import HLTVClient
-
+# from .client import HLTVClient
+from zenrows import ZenRowsClient
+import cloudscraper
 
 class HLTVCrawler:
 
     def __init__(self):
-        self.base_url = 'https://www.hltv.org'
-        self.hltv_client = HLTVClient()
+        # noting
+        self.scraper = cloudscraper.create_scraper(debug=True)
+        pass
 
     def crawl_matches(self, start_date: date, end_date: date) -> list[str]:
         # Need to verify that the matches are at the current day or after (matches must occur in the future)
@@ -32,15 +34,10 @@ class HLTVCrawler:
         # you can also do things like the following
         # hltv.org/matches?archive
 
-        #(1) INPUT VALIDATION: check that start_date and end_date are in range
-        url = f'{self.hltv_client.base_url}/results?startDate={str(start_date)}&endDate={str(end_date)}'
-        resp = self.hltv_client._fetch_page(url, '.sidebar-headline', 'debug_hltv_result.html')
-
-        # Now that we have our response we want to go through each .result tag and get their link content
-        # notice reach .result has a parent a tage which has the href which is the link to the match
-        # what we can do is then get this link, extract the match_id and match_name using regex matching
-        bs = BeautifulSoup(resp, 'html.parser')
-        print(bs.find('.result').parent.href)
+        #(1) INPUT VALIDATION: check that start_date and end_date are in range        
+        url = f'https://www.hltv.org/results?startDate={str(start_date)}&endDate={str(end_date)}'
+        print(url)
+        print(self.scraper.get(url).text)
 
     def crawl_teams(self, start_date: date, end_date: date) -> list[str]:
         pass

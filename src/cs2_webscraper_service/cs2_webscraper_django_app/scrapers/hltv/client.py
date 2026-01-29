@@ -4,6 +4,10 @@ from bs4 import BeautifulSoup
 from urllib.request import Request, urlopen
 import requests
 from playwright.sync_api import sync_playwright
+import time
+import random
+from playwright_stealth import Stealth
+import asyncio
 
 class HLTVClient:
 
@@ -30,7 +34,7 @@ class HLTVClient:
 
         # Setting up the browser
         self.playwright = sync_playwright().start()
-        self.browser = self.playwright.chromium.launch(headless=True, args=self.browser_args)
+        self.browser = self.playwright.chromium.launch(headless=False, args=self.browser_args)
         self.context = self.browser.new_context(
             user_agent = self.user_agent,
             viewport = self.viewport,
@@ -39,10 +43,17 @@ class HLTVClient:
         self.page = self.context.new_page()
 
     def _fetch_page(self, url: str, selector: str, debug_file: str) -> str:
+        # Sleep in order to maintain timing/ rate limit
+        sleep_duration = random.randint(4,10)
+        time.sleep(sleep_duration)
         self.page.goto(url, wait_until="domcontentloaded") #domcontentloaded
-        print(self.page.content())
+        # print(self.page.content())
+        sleep_duration = random.randint(4,10)
+        time.sleep(sleep_duration)
         self.page.wait_for_selector(selector, timeout = self.timeout)
         html = self.page.content()
+        sleep_duration = random.randint(4,10)
+        time.sleep(sleep_duration)
         if debug_file:
             with open(debug_file, "w", encoding="utf-8") as f:
                 f.write(html)
@@ -72,12 +83,13 @@ class HLTVClient:
 
     def get_tournament(self, tournament_id: str, tournament_name: str) -> HTTPResponse:
         url = f"{self.base_url}/events/{tournament_id}/{tournament_name}"
+        print("getting the url")
         return self._fetch_page(url, '.event-hub', 'debug_hltv_tournament.html')
 
 if __name__ == "__main__":
     hltv_client = HLTVClient()
-    # hltv_client.get_match('2389280', 'paravision-vs-furia-blast-bounty-2026-season-1-finals')
-    # hltv_client.get_team('9565', 'vitality')
+    hltv_client.get_match('2389280', 'paravision-vs-furia-blast-bounty-2026-season-1-finals')
+    hltv_client.get_team('9565', 'vitality')
     hltv_client.get_tournament('8575', 'iem-krakw-2026-stage-1')
     # this is vitality team_ranking (valve ranking)
-    # hltv_client.get_team_ranking("2026", "january", '24', '95665', 'valve-ranking')
+    hltv_client.get_team_ranking("2026", "january", '24', '95665', 'valve-ranking')
