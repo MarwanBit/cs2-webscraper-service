@@ -4,23 +4,27 @@ from datetime import datetime
 from http.client import HTTPResponse
 from bs4 import BeautifulSoup
 from urllib.request import Request, urlopen
-import requests
 # from .client import HLTVClient
-from zenrows import ZenRowsClient
-import cloudscraper
+import asyncio
+import random
+import nodriver as uc
+
+
+def random_delay(min_sec=0.5, max_sec=1.5):
+    return random.uniform(min_sec, max_sec)
 
 class HLTVCrawler:
 
-    def __init__(self):
+    async def __init__(self):
         # noting
-        self.scraper = cloudscraper.create_scraper(debug=True)
-        pass
+        self.browser = await uc.start(sandbox=False)
 
-    def crawl_matches(self, start_date: date, end_date: date) -> list[str]:
+
+    async def crawl_matches(self, start_date: date, end_date: date) -> list[str]:
         # Need to verify that the matches are at the current day or after (matches must occur in the future)
         pass
 
-    def crawl_results(self, start_date: date, end_date: date) -> list[str]:
+    async def crawl_results(self, start_date: date, end_date: date, offset: int) -> list[str]:
         # must verify that the results are within a range that is before or during the current day (results must be in the past)
         # notice here are some example API routes/ routes for crawl
         # hltv.org/results?startDate=2025-12-26&endDate=2026-01-26
@@ -33,19 +37,21 @@ class HLTVCrawler:
         #  Lot's of really cool filter for the api
         # you can also do things like the following
         # hltv.org/matches?archive
+        # offset should be a multiple of 100
 
         #(1) INPUT VALIDATION: check that start_date and end_date are in range        
-        url = f'https://www.hltv.org/results?startDate={str(start_date)}&endDate={str(end_date)}'
-        print(url)
-        print(self.scraper.get(url).text)
+        url = f'https://www.hltv.org/results?startDate={str(start_date)}&endDate={str(end_date)}&offset={offset}'
+        page = await self.browser.get(url)
+        await page
+        await asyncio.sleep(random_delay(3, 5))
 
-    def crawl_teams(self, start_date: date, end_date: date) -> list[str]:
+    async def crawl_teams(self, start_date: date, end_date: date) -> list[str]:
         pass
 
-    def crawl_team_rankings(self, start_date) -> list[str]:
+    async def crawl_team_rankings(self, start_date) -> list[str]:
         pass
 
-    def crawl_tournaments(self, start_date: date, end_date: date) -> list[str]:
+    async def crawl_tournaments(self, start_date: date, end_date: date) -> list[str]:
         pass
 
 

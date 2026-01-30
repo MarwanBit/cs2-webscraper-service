@@ -13,13 +13,14 @@ def random_delay(min_sec=0.5, max_sec=1.5):
 
 async def scraper():
     # Launch undetected Chrome
-    browser = await uc.start()
+    browser = await uc.start(sandbox=False)
     
     # Open HLTV results page
-    page = await browser.get("https://www.hltv.org/results")
+    page = await browser.get(f"https://www.hltv.org/results?startDate={START_DATE}&endDate={END_DATE}")
     await page
     await asyncio.sleep(random_delay(3, 5))
     
+    '''
     # 1️⃣ Double-click start date input to open calendar
     start_input = await page.select('input[name="startDate"]')
     if start_input:
@@ -60,12 +61,9 @@ async def scraper():
             continue
     await asyncio.sleep(random_delay(1, 2))
     
-    # Wait for results to load after date selection
-    print("Waiting for results to load...")
-    await asyncio.sleep(random_delay(8, 12))
-    
     await page
     print(f"Done! URL: {page.url}")
+    '''
     
     # Save HTML content
     html = await page.get_content()
