@@ -4,10 +4,11 @@ from datetime import datetime
 from http.client import HTTPResponse
 from bs4 import BeautifulSoup
 from urllib.request import Request, urlopen
-# from .client import HLTVClient
+from .client import HLTVClient
 import asyncio
 import random
 import nodriver as uc
+import re
 
 
 def random_delay(min_sec=0.5, max_sec=1.5):
@@ -15,14 +16,38 @@ def random_delay(min_sec=0.5, max_sec=1.5):
 
 class HLTVCrawler:
 
-    async def __init__(self):
+    def __init__(self):
         # noting
-        self.browser = await uc.start(sandbox=False)
+        self.hltv_client = None
 
-
-    async def crawl_matches(self, start_date: date, end_date: date) -> list[str]:
+    @classmethod
+    async def create(cls):
+        instance = cls()
+        instance.hltv_client = await HLTVClient.create()
+        return instance
+    
+    async def crawl_matches(self, date: date) -> list[str]:
         # Need to verify that the matches are at the current day or after (matches must occur in the future)
-        pass
+        url = f'{self.hltv_client.base_url}/matches?selectedDate={date.year}-{date.month}-{date.day}'
+        html = await self.hltv_client._fetch_page(url, '.matches', 'hltv_matches.html')
+
+        soup = BeautifulSoup(html, 'html.parser')
+        res = []
+        # Notice these matches use non-relative links unlike results
+        pattern = re.compile(r"^https://www.hltv.org/matches/(?P<match_id>[^/]+)/(?P<match_name>[^/]+)$")
+        for result in soup.find_all(class_="match"):
+            a_tag = result.find("a")
+            link = a_tag['href']
+            m = pattern.match(link)
+            if m:
+                match_id = m.group("match_id")
+                match_name = m.group("match_name")
+                res.append({
+                    "match_id": match_id,
+                    "match_name": match_name
+                })
+        print(res)
+        return res
 
     async def crawl_results(self, start_date: date, end_date: date, offset: int) -> list[str]:
         # must verify that the results are within a range that is before or during the current day (results must be in the past)
@@ -40,21 +65,77 @@ class HLTVCrawler:
         # offset should be a multiple of 100
 
         #(1) INPUT VALIDATION: check that start_date and end_date are in range        
-        url = f'https://www.hltv.org/results?startDate={str(start_date)}&endDate={str(end_date)}&offset={offset}'
-        page = await self.browser.get(url)
-        await page
-        await asyncio.sleep(random_delay(3, 5))
+        url = f'{self.hltv_client.base_url}/results?startDate={str(start_date)}&endDate={str(end_date)}&offset={offset}'
+        html = await self.hltv_client._fetch_page(url, '.results', 'hltv_result.html')
 
-    async def crawl_teams(self, start_date: date, end_date: date) -> list[str]:
-        pass
+        soup = BeautifulSoup(html, 'html.parser')
 
-    async def crawl_team_rankings(self, start_date) -> list[str]:
+        res = []
+        pattern = re.compile(r"^/matches/(?P<match_id>[^/]+)/(?P<match_name>[^/]+)$")
+        for result in soup.find_all(class_="result-con"):
+            a_tag = result.find(class_="a-reset")
+            link = a_tag['href']
+            m = pattern.match(link)
+            if m:
+                match_id = m.group("match_id")
+                match_name = m.group("match_name")
+                res.append({
+                    "match_id": match_id,
+                    "match_name": match_name
+                })
+        print(res)
+        return res
+
+    async def crawl_teams(self, year: str, month: str, day: str) -> list[str]:
+        '''
+        maybe we also want to add some sort of navigation here, since you only have rankings available
+        every week or so on specific dates, so not every year, month, day combo works.
+
+        valve-raking has it available each day though, so this could be helpful, additional api endpoints 
+        are the following
+
+        http://hltv.org/2026/january/5/region/Europe
+        '''
+        url = f'{self.hltv_client.base_url}/valve-ranking/teams/{year}/{month}/{day}'
+        html_content = await self.hltv_client._fetch_page(url, '.teams', 'hltv_teams.html')
+        
+        soup = BeautifulSoup(html_content, 'html.parser')
+        res = []
+        pattern = re.compile(r"^https://www.hltv.org/team/(?P<team_id>[^/]+)/(?P<team_name>[^/]+)$")
+        for result in soup.find_all(class_="ranked-team standard-box"):
+            line_up = result.find(class_="lineup-con hidden")
+            team_link = line_up.find(class_="more").find(class_="moreLink")['href']
+            m = pattern.match(team_link)
+            if m:
+                team_id = m.group("team_id")
+                team_name = m.group("team_name")
+                res.append({
+                    "team_id": team_id,
+                    "team_name": team_name
+                })
+        print(res)
+        return res
+
+    async def crawl_team_rankings(self, year: str, month: str, day: str, ranking_type: str) -> list[str]:
+        url = f'{self.hltv_client.base_url}/valve-rankings/teams/{year}/{month}/{day}'
+        res = await self.hltv_client._fetch_page(url, '.regional-ranking-header', 'hltv_team_rankings.html')
         pass
 
     async def crawl_tournaments(self, start_date: date, end_date: date) -> list[str]:
-        pass
+        # We want to scrape the upcoming tournaments so we'll ignore start and end date for now
+        # example of the API end points
+        # for upcoming and future events they are all on the following endpoint:
+        # https://www.hltv.org/events
+        # for historical events you have to go to the following
+        # https://www.hltv.org/events/archive?startDate={start_date}&endDate={end_date}&eventType={EVENT_TYPE}&prizeMin&prizeMax&player={playerId}
+        # &valveRanked=RANKED
+        url = f'{self.hltv_client.base_url}/events'
+        res = await self.hltv_client._fetch_page(url, '.events', 'hltv_events.html')
+        return res
 
 
 if __name__ == "__main__":
-    crawler = HLTVCrawler()
-    crawler.crawl_results(date(2026, 1, 20), date(2026, 1, 26))
+    async def main():
+        crawler = await HLTVCrawler.create()
+        await crawler.crawl_results(date(2026, 1, 20), date(2026, 1, 26), 0)
+    uc.loop().run_until_complete(main())
