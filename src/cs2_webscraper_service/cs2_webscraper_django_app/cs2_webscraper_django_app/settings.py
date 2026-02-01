@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     "cs2_webscraper_service.cs2_webscraper_django_app.core.apps.CoreConfig",
     "cli",
     "scrapers",
-    "utils"
+    # Note: utils is NOT a Django app (no apps.py), just import it as a module
 ]
 
 MIDDLEWARE = [
